@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Администраторски панел";
+}
+
+<h1>Администраторски панел</h1>
+
+<a asp-controller="Admin" asp-action="Statistics" class="quick-action stats-action">
+    <div class="action-icon">📊</div>
+    <div>
+        <strong>Статистики</strong>
+        <p>Графики и анализи</p>
+    </div>
+</a>
+
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Общо коли</h5>
+            <h2>@ViewBag.TotalCars</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Налични коли</h5>
+            <h2>@ViewBag.AvailableCars</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Резервирани коли</h5>
+            <h2>@ViewBag.ReservedCars</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Общо наеми</h5>
+            <h2>@ViewBag.TotalRentals</h2>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Активни</h5>
+            <h2>@ViewBag.ActiveRentals</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Завършени</h5>
+            <h2>@ViewBag.CompletedRentals</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Отказани</h5>
+            <h2>@ViewBag.CancelledRentals</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3">
+            <h5>Приход</h5>
+            <h2>@ViewBag.TotalRevenue €.</h2>
+        </div>
+    </div>
+</div>
+
+<a asp-controller="Cars" asp-action="Index" class="btn btn-primary">Управление на коли</a>
+<a asp-controller="Rentals" asp-action="MyRentals" class="btn btn-secondary">Управление на наеми</a>

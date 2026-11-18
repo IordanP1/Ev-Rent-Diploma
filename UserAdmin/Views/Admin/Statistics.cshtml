@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Статистики";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4 fw-bold">Статистики</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-4 text-center">
+                <h5 class="text-muted">Общ приход</h5>
+                <h2 class="fw-bold text-success">
+                    @ViewBag.TotalRevenue €
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 p-4">
+                <h4 class="mb-3">Статус на автомобилите</h4>
+                <canvas id="carsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 p-4">
+                <h4 class="mb-3">Статус на наемите</h4>
+                <canvas id="rentalsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const carsChart = new Chart(document.getElementById('carsChart'), {
+     type: 'pie',
+    data: {
+           labels: ['Налични', 'Резервирани'],
+    datasets: [{
+         data: [@ViewBag.AvailableCars, @ViewBag.ReservedCars],
+         backgroundColor: ['#198754', '#ffc107']
+            }]
+        }
+    });
+
+    const rentalsChart = new Chart(document.getElementById('rentalsChart'), {
+       type: 'bar',
+       data: {
+        labels: ['Активни', 'Завършени', 'Отказани'],
+        datasets: [{
+        label: 'Брой наеми',
+        data: [
+            @ViewBag.ActiveRentals,
+            @ViewBag.CompletedRentals,
+            @ViewBag.CancelledRentals
+        ],
+         backgroundColor: ['#0d6efd', '#198754', '#dc3545']
+        }]
+       }
+    });
+</script>

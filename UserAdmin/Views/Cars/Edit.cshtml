@@ -1,0 +1,52 @@
+﻿@model EvRent.Models.Car
+
+<h2>Редактирай автомобил</h2>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <input asp-for="Brand" class="form-control mb-2" placeholder="Марка" />
+    <input asp-for="Model" class="form-control mb-2" placeholder="Модел" />
+    <input asp-for="Year" class="form-control mb-2" placeholder="Година" />
+    <input asp-for="Seats" class="form-control mb-2" placeholder="Места" />
+
+    <div class="mb-2">
+    <select asp-for="Category" class="form-control">
+        <option value="">Избери категория</option>
+        <option value="economy">Economy</option>
+        <option value="premium">Premium</option>
+        <option value="suv">SUV</option>
+    </select>
+    </div>
+
+    <input asp-for="BatteryCapacityKwh" class="form-control mb-2" placeholder="Батерия kWh" />
+    <input asp-for="BatteryLevelPercent" class="form-control mb-2" placeholder="Заряд %" />
+    <input asp-for="AverageConsumptionKwhPer100km" class="form-control mb-2" placeholder="Разход kWh/100km" />
+    <input asp-for="OfficialRangeKm" class="form-control mb-2" placeholder="Официален пробег km" />
+
+    <div class="form-check mb-2">
+        <input asp-for="IsFastChargingSupported" class="form-check-input" />
+        <label asp-for="IsFastChargingSupported" class="form-check-label">
+            Поддържа бързо зареждане
+        </label>
+    </div>
+
+    <div class="mb-2">
+        <select asp-for="ConnectorType" class="form-control">
+            <option value="">Избери конектор</option>
+            <option value="Type 2">Type 2</option>
+            <option value="CCS Combo 2">CCS Combo 2</option>
+            <option value="CHAdeMO">CHAdeMO</option>
+        </select>
+    </div>    
+    <input asp-for="PricePerDay" class="form-control mb-2" placeholder="Цена на ден" />
+    <input asp-for="ImageUrl" class="form-control mb-2" placeholder="URL снимка" />
+    <input asp-for="RegistationNumber" class="form-control mb-2" placeholder="Рег. номер" />
+
+    <textarea asp-for="Description" class="form-control mb-2" placeholder="Описание"></textarea>
+
+    <input type="hidden" asp-for="Status" />
+
+    <button type="submit" class="btn btn-warning">Запази промените</button>
+    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+</form>

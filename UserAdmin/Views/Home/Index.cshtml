@@ -1,0 +1,129 @@
+﻿@model List<EvRent.Models.Car>
+@{
+    ViewData["Title"] = "Начало";
+}
+
+<section class="hero">
+    <div class="container text-center">
+        <p class="subtitle">⚡ Екологична мобилност</p>
+
+        <h1 class="title">
+            Наемете електромобил <span class="green">лесно и бързо</span>
+        </h1>
+
+        <p class="description">
+            Интелигентна система за наем на електромобили с онлайн резервации,
+            карта на зарядни станции и прогнозиране на пробега.
+        </p>
+
+        <div class="mt-4">
+            <a asp-controller="Cars" asp-action="Index" class="btn btn-success btn-lg">
+                Разгледай автомобили →
+            </a>
+
+            <a asp-controller="Range" asp-action="Index" class="btn btn-outline-secondary btn-lg ms-2">
+                Калкулатор на пробег
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="features container text-center my-5">
+    <h2>Защо да ни изберете</h2>
+    <p class="text-muted mb-4">Всичко, от което се нуждаете за електрическо пътуване</p>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>⚡ 100% електрически</h5>
+                <p>Нулеви емисии и максимално удоволствие.</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>🗺️ Карта на станции</h5>
+                <p>Интерактивна карта със зарядни станции.</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>📊 Прогнозен пробег</h5>
+                <p>Интелигентен алгоритъм за пробег.</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>💳 Гъвкаво плащане</h5>
+                <p>Онлайн или на място – ти избираш.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats text-center text-white py-4">
+    <div class="container row">
+        <div class="col-md-3">
+            <h3>50+</h3>
+            <p>Електромобила</p>
+        </div>
+
+        <div class="col-md-3">
+            <h3>1000+</h3>
+            <p>Зарядни станции</p>
+        </div>
+
+        <div class="col-md-3">
+            <h3>24/7</h3>
+            <p>Поддръжка</p>
+        </div>
+
+        <div class="col-md-3">
+            <h3>0</h3>
+            <p>CO₂ емисии</p>
+        </div>
+    </div>
+</section>
+
+<section class="featured-cars">
+    <h2>Налични автомобили</h2>
+
+    <div class="car-grid">
+        @foreach (var car in Model)
+        {
+            <div class="car-card">
+                <img src="@car.ImageUrl" alt="@car.Brand @car.Model" />
+
+                <div class="car-info">
+                    <h3>@car.Brand @car.Model</h3>
+
+                    <div class="specs">
+                        <span>🔋 @car.BatteryCapacityKwh kWh</span>
+                        <span>📍 @car.OfficialRangeKm km</span>
+                    </div>
+
+                    <div class="price">
+                        @car.PricePerDay € / ден
+                    </div>
+
+                    <a asp-controller="Cars"
+                           asp-action="Details"
+                           asp-route-id="@car.Id"
+                           class="btn btn-primary reserve-btn">
+                        Разгледай
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-controller="Cars"
+               asp-action="Index"
+               class="btn btn-primary">
+            Виж всички автомобили
+        </a>
+    </div>
+</section>

@@ -1,0 +1,139 @@
+﻿@{
+    ViewData["Title"] = "Зарядни станции";
+
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<div class="container my-4">
+    <h1 class="mb-3">Карта на зарядни станции</h1>
+
+    <div class="mb-3 d-flex align-items-center gap-2">
+        <button id="findMeBtn" class="btn btn-success">
+            📍 Намери станции близо до мен
+        </button>
+      
+
+        <div id="statusText" class="text-muted small">Зареждане...</div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div id="map" style="height: 600px; border-radius: 16px;"></div>
+        </div>
+    </div>  
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+<script>
+    (() => {
+        const statusEl = document.getElementById('statusText');
+        const findMeBtn = document.getElementById('findMeBtn');
+
+         if (!navigator.onLine)
+         {
+          statusEl.classList.remove("text-muted");
+          statusEl.classList.add("text-danger");
+          statusEl.textContent = "⚠️ Няма интернет връзка. Информацията за зарядните станции не е достъпна.";
+          return;
+         }
+
+        const setStatus = (text) => {
+            statusEl.textContent = text || '';
+        };
+
+       if (typeof L === 'undefined')
+        {
+          statusEl.classList.remove("text-muted");
+          statusEl.classList.add("text-danger");
+          setStatus("⚠️ Няма интернет връзка или картата не може да бъде заредена. Информацията за зарядните станции временно не е достъпна.");
+           return;
+        }
+        const map = L.map('map').setView([42.6977, 23.3219], 7);
+       
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        findMeBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                alert("Браузърът не поддържа локация");
+                return;
+            }
+
+            setStatus('Опитваме се да намерим вашата локация…');
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    map.setView([lat, lng], 13);
+
+                    L.marker([lat, lng])
+                        .addTo(map)
+                        .bindPopup("📍 Вашата локация")
+                        .openPopup();
+
+                    setStatus('Намерени станции около вас (зареждане)…');
+                },
+                () => {
+                    alert("Не успяхме да вземем локацията");
+                    setStatus('');
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        });
+
+        setStatus('Зареждане на станции…');
+
+        fetch('/api/stations')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                setStatus('');
+                if (!Array.isArray(data)) return;
+
+                data.forEach(station => {
+                    const info = station.AddressInfo || station.addressInfo || station;
+
+                    if (!info) return;
+
+                    const lat = info.Latitude ?? info.latitude;
+                    const lng = info.Longitude ?? info.longitude;
+                    const title = info.Title || info.title || "Зарядна станция";
+                    const address = info.AddressLine1 || info.addressLine1 || "";
+                    const town = info.Town || info.town || "";
+
+                    if (lat == null || lng == null) return;
+
+                    const popupHtml =
+                        `<strong>${escapeHtml(title)}</strong><br>` +
+                        (address ? `${escapeHtml(address)}<br>` : '') +
+                        (town ? `Град: ${escapeHtml(town)}` : '');
+
+                    L.marker([lat, lng])
+                        .addTo(map)
+                        .bindPopup(popupHtml);
+                });
+            })
+            .catch(error => {
+                console.error("Грешка при зареждане:", error);
+                setStatus('⚠️ В момента информацията за зарядните станции не е достъпна. Проверете интернет връзката си или опитайте по-късно.');
+                });
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+    })();
+</script>

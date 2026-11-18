@@ -1,0 +1,92 @@
+﻿@model List<EvRent.Models.Rental>
+
+<h2>Моите наеми</h2>
+
+@if (!Model.Any())
+{
+    <p>Нямате направени резервации.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Автомобил</th>
+                <th>Период</th>
+                <th>Дни</th>
+                <th>Цена</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var rental in Model)
+            {
+                <tr>
+                    <td>@rental.Car.Brand @rental.Car.Model</td>
+                    <td>@rental.StartDate.ToShortDateString() - @rental.EndDate.ToShortDateString()</td>
+                    <td>@rental.TotalDays</td>
+                    <td>@rental.TotalPrice €</td>
+
+                    <td>
+                        @switch (rental.Status)
+                        {
+                            case "reserved":
+                                <span class="text-warning fw-bold">⏳ Резервиран</span>
+                                break;
+
+                            case "paid":
+                                <span class="text-primary fw-bold">💳 Платен</span>
+                                break;
+
+                            case "pending_payment":
+                                <span class="text-secondary fw-bold">⌛ Очаква плащане</span>
+                                break;
+
+                            case "completed":
+                                <span class="text-success fw-bold">✅ Приключен</span>
+                                break;
+
+                            case "cancelled":
+                                <span class="text-danger fw-bold">❌ Отказан</span>
+                                break;
+
+                            default:
+                                <span>@rental.Status</span>
+                                break;
+                        }
+                    </td>
+
+                    <td>
+                        @if (rental.Status == "reserved" || rental.Status == "paid" || rental.Status == "pending_payment")
+                        {
+                            <div class="d-flex gap-2">
+                                @if (User.IsInRole("Admin") && rental.Status != "pending_payment")
+                                {
+                                    <form asp-controller="Rentals" asp-action="Complete" method="post">
+                                        <input type="hidden" name="id" value="@rental.Id" />
+                                        <button type="submit" class="btn btn-success">
+                                            Завърши
+                                        </button>
+                                    </form>
+                                }
+
+                                <form asp-controller="Rentals" asp-action="Cancel" method="post">
+                                    <input type="hidden" name="id" value="@rental.Id" />
+                                    <button type="submit" class="btn btn-danger">
+                                        Откажи
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

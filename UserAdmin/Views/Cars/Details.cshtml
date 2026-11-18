@@ -1,0 +1,171 @@
+﻿@model EvRent.Models.Car
+@{
+    var availableEnergy = Model.BatteryCapacityKwh * Model.BatteryLevelPercent / 100.0;
+
+    var estimatedRange = Model.AverageConsumptionKwhPer100km > 0
+        ? Math.Round((availableEnergy / Model.AverageConsumptionKwhPer100km) * 100, 1)
+        : 0;
+}
+<link rel="stylesheet" href="/css/site.css" />
+
+<div class="page-container">
+    <div class="detail-layout">
+        <div class="detail-main">
+            <img src="@Model.ImageUrl" alt="@Model.Brand @Model.Model" class="detail-img" />
+
+            <h1>@Model.Brand @Model.Model</h1>
+            <p class="description">@Model.Description</p>
+
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <strong>Батерия</strong>
+                    <span>@Model.BatteryCapacityKwh kWh</span>
+                </div>
+
+                <div class="spec-item">
+                    <strong>Общ пробег на автомобила</strong>
+                    <span>@Model.OfficialRangeKm km</span>
+                </div>
+
+                <div class="spec-item">
+                    <strong>Конектор</strong>
+                    <span>@Model.ConnectorType</span>
+                </div>
+
+                <div class="spec-item">
+                    <strong>Бързо зареждане</strong>
+                    <span>@(Model.IsFastChargingSupported ? "Да" : "Не")</span>
+                </div>
+
+                <div class="spec-item">
+                    <strong>Места</strong>
+                    <span>@Model.Seats</span>
+                </div>
+
+                <div class="spec-item">
+                    <strong>Година</strong>
+                    <span>@Model.Year</span>
+                </div>
+                <div class="spec-item">
+
+                    <strong>Текущ заряд</strong>
+                    <span>@Model.BatteryLevelPercent%</span>
+                </div>
+
+                <div class="spec-item">
+                    <strong>Среден разход</strong>
+                    <span>@Model.AverageConsumptionKwhPer100km kWh/100km</span>
+                </div>
+
+                <div class="spec-item estimate-range">
+                    <strong>Прогнозен пробег</strong>
+                    <span>@estimatedRange km</span>
+                </div>
+                
+            </div>
+            <p class="range-info">
+                ℹ️ Прогнозният пробег е изчислен според текущия заряд, капацитета на батерията и средния разход на автомобила.
+            </p>
+        </div>
+        
+
+        <div class="detail-sidebar">
+            @if (Model.Status == "available")
+            {
+                <div class="rental-form-card">
+                    <h2>Резервация</h2>
+
+                    <form asp-controller="Rentals" asp-action="Create" method="post">
+                        <input type="hidden" name="CarId" value="@Model.Id" />
+
+                        <label>Начална дата</label>
+                        <input type="date" name="StartDate" required />
+
+                        <label>Крайна дата</label>
+                        <input type="date" name="EndDate" required />
+
+                        <label>Начин на плащане</label>
+                        <select name="PaymentMethod">
+                            <option value="online">Онлайн с карта</option>
+                            <option value="cash">На място</option>
+                        </select>
+
+                        <label>Вашето име</label>
+                        <input type="text" name="CustomerName" required />
+
+                        <label>Имейл</label>
+                        <input type="email" name="CustomerEmail" required />
+
+                        <label>Телефон</label>
+                        <input type="tel" name="CustomerPhone" />
+
+                        <p class="price-info">
+                            Цена на ден: <strong id="pricePerDay">@Model.PricePerDay</strong> €.
+                        </p>
+
+                        <div class="alert alert-info">
+                            <p>Дни: <strong id="totalDays">0</strong></p>
+                            <p>Базова цена: <strong id="basePrice">0.00</strong> €.</p>
+                            <p>Застраховка 8%: <strong id="insurancePrice">0.00</strong> €.</p>
+                            <p>Общо: <strong id="totalPrice">0.00</strong> €.</p>
+                        </div>
+
+                        <button type="submit" class="btn-primary full-width">
+                            Резервирай
+                        </button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="rental-form-card">
+                    <h2>Резервация</h2>
+                    <p>Този автомобил вече е зает.</p>
+                    <button class="btn btn-secondary full-width" disabled>
+                        Вече е заета
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    const startInput = document.querySelector('input[name="StartDate"]');
+    const endInput = document.querySelector('input[name="EndDate"]');
+
+    const pricePerDay = parseFloat(document.getElementById('pricePerDay').innerText.replace(',', '.'));
+
+    const totalDaysEl = document.getElementById('totalDays');
+    const basePriceEl = document.getElementById('basePrice');
+    const insurancePriceEl = document.getElementById('insurancePrice');
+    const totalPriceEl = document.getElementById('totalPrice');
+
+    function calculatePrice() {
+        const startDate = new Date(startInput.value);
+        const endDate = new Date(endInput.value);
+
+        if (!startInput.value || !endInput.value || endDate <= startDate) {
+            totalDaysEl.innerText = "0";
+            basePriceEl.innerText = "0.00";
+            insurancePriceEl.innerText = "0.00";
+            totalPriceEl.innerText = "0.00";
+            return;
+        }
+
+        const diffTime = endDate - startDate;
+        const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        const basePrice = days * pricePerDay;
+        const insurance = basePrice * 0.08;
+        const total = basePrice + insurance;
+
+        totalDaysEl.innerText = days;
+        basePriceEl.innerText = basePrice.toFixed(2);
+        insurancePriceEl.innerText = insurance.toFixed(2);
+        totalPriceEl.innerText = total.toFixed(2);
+    }
+
+    startInput.addEventListener('change', calculatePrice);
+    endInput.addEventListener('change', calculatePrice);
+</script>

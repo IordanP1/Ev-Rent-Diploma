@@ -1,0 +1,54 @@
+﻿@model List<EvRent.Models.Car>
+
+<link rel="stylesheet" href="~/css/site.css" />
+<div class="page-container">
+    <h1>Каталог с автомобили</h1>
+
+    <form method="get" class="filters">
+        <input type="text" name="search" placeholder="Търси марка или модел..." />
+        <select name="category">
+            <option value="">Всички категории</option>
+            <option value="economy">Икономичен</option>
+            <option value="comfort">Комфорт</option>
+            <option value="premium">Премиум</option>
+            <option value="suv">SUV</option>
+        </select>
+        <button type="submit" class="btn-primary">Търси</button>
+    </form>
+
+    <div class="car-grid">
+        @foreach (var car in Model)
+        {
+            <div class="car-card">
+                @if (!string.IsNullOrEmpty(car.ImageUrl))
+                {
+                    <img src="@car.ImageUrl" alt="@car.Brand @car.Model" />
+                }
+                <div class="car-info">
+                    <span class="badge @car.Status">
+                        @(car.Status == "available" ? "Наличен" : "Зает")
+                    </span>
+                    <h3>@car.Brand @car.Model (@car.Year)</h3>
+                    <div class="specs">
+                        <span>🔋 @car.BatteryCapacityKwh kWh</span>
+                        <span>📍 @car.OfficialRangeKm km</span>
+                        <span>🔌 @car.ConnectorType</span>
+                        <span>👥 @car.Seats места</span>
+                    </div>
+                    <div class="battery-bar">
+                        <div class="battery-fill" style="width: @car.BatteryLevelPercent%"></div>
+                    </div>
+                    <p class="price">@car.PricePerDay €. / ден</p>
+                    @if (car.Status == "available")
+                    {
+                        <a asp-controller="Cars" asp-action="Details" asp-route-id="@car.Id" class="btn-primary">Резервирай →</a>
+                    }
+                    else
+                    {
+                        <button class="btn-disabled" disabled>Недостъпен</button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

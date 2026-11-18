@@ -1,0 +1,32 @@
+﻿@model EvRent.Models.Rental
+
+<h2>Резервация</h2>
+
+<div class="mb-3">
+    <strong>Автомобил:</strong> @Model.Car.Brand @Model.Car.Model<br />
+    <strong>Цена на ден:</strong> @Model.Car.PricePerDay €.
+</div>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="CarId" />
+
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+    <label>Начална дата</label>
+    <input asp-for="StartDate" type="date" class="form-control mb-2" />
+
+    <label>Крайна дата</label>
+    <input asp-for="EndDate" type="date" class="form-control mb-2" />
+
+    <input asp-for="CustomerName" class="form-control mb-2" placeholder="Име" />
+    <input asp-for="CustomerEmail" class="form-control mb-2" placeholder="Имейл" />
+    <input asp-for="CustomerPhone" class="form-control mb-2" placeholder="Телефон" />
+
+    <select asp-for="PaymentMethod" class="form-control mb-2">
+        <option value="cash">Плащане на място</option>
+        <option value="online">Онлайн плащане</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Потвърди резервация</button>
+    <a asp-controller="Cars" asp-action="Details" asp-route-id="@Model.CarId" class="btn btn-secondary">Назад</a>
+</form>

@@ -1,0 +1,110 @@
+﻿@model List<EvRent.Models.Car>
+
+<div class="page-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Налични автомобили</h1>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="Cars" asp-action="Create" class="btn btn-success">
+                ➕ Добави кола
+            </a>
+        }
+    </div>
+
+    <form method="get" class="filters mb-4">
+        <input type="text" name="search" placeholder="Търси марка или модел..." class="form-control" />
+        <select name="category" class="form-control">
+            <option value="">Всички категории</option>
+            <option value="economy">Икономичен</option>
+            <option value="premium">Премиум</option>
+            <option value="suv">SUV</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Търси</button>
+    </form>
+
+    <div class="car-grid">
+        @foreach (var car in Model)
+        {
+            <div class="car-card">
+                @if (!string.IsNullOrWhiteSpace(car.ImageUrl))
+                {
+                    <img src="@car.ImageUrl" alt="@car.Brand @car.Model" />
+                }
+
+                <div class="car-info">
+                    <span class="badge @(car.Status == "available" ? "bg-success" : "bg-secondary")">
+                        @(car.Status == "available" ? "Наличен" : "Недостъпен")
+                    </span>
+
+                    <h3>@car.Brand @car.Model</h3>
+
+                    <p>
+                        🔋 @car.BatteryCapacityKwh kWh |
+                        📍 @car.OfficialRangeKm km |
+                        👥 @car.Seats места
+                    </p>
+
+                    <p class="price">@car.PricePerDay €. / ден</p>
+
+                    
+                    <a asp-controller="Cars" asp-action="Details" asp-route-id="@car.Id" class="btn btn-primary reserve-btn"> Разгледай</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="admin-car-actions">
+                        <a asp-controller="Cars" asp-action="Edit" asp-route-id="@car.Id" class="btn btn-warning"> ✏️ Промени </a>
+                        <a asp-controller="Cars" asp-action="Delete" asp-route-id="@car.Id" class="btn btn-danger">🗑 Изтрии </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-category="@ViewBag.CurrentCategory"
+                           asp-route-search="@ViewBag.CurrentSearch">
+                        ← Назад
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-category="@ViewBag.CurrentCategory"
+                           asp-route-search="@ViewBag.CurrentSearch">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-category="@ViewBag.CurrentCategory"
+                           asp-route-search="@ViewBag.CurrentSearch">
+                        Напред →
+                    </a>
+                </li>
+            }
+
+        </ul>
+    </nav>
+}
